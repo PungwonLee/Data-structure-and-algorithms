@@ -53,7 +53,7 @@ int main() {
 	scanf("%d", &n);
 	int* arr = (int*)malloc(sizeof(int) * n);
 	for (int i = 0; i < n; i++)
-		scnaf("%d", &arr[i]);
+		scanf("%d", &arr[i]);
 
 	
 
