@@ -1,0 +1,114 @@
+#pragma warning(disable:4996)
+#include <stdio.h>
+#include <stdlib.h>
+
+typedef struct edge {
+	int v;
+	struct edge* next;
+}edge;
+void dfs(edge** g, int v, int* ch, int* cycle, int parent) {
+	ch[v] = 1;			//해당 정점 방문 체크
+	edge* tmp = g[v];	
+	while (tmp != NULL)	{			//v정점의 간선들을 탐색
+		if (ch[tmp->v] == 0) dfs(g, tmp->v, ch, cycle, v); // ch[tmp->v]이 0이면 미방문이므로 dfs재호출
+		else if (tmp->v != parent) *cycle = 1;				//tmp->v가 parent와 같지 않으면 사이클이므로 cycle에 1저장
+		tmp = tmp->next;
+	}
+}
+int main(void) {
+	int n, m, u, v, cnt = 0, size, cycle = 0;
+	scanf("%d %d", &n, &m);
+	size = n;
+
+	edge** g = (edge**)malloc(sizeof(edge*) * (n + 1));			//그래프 배열
+	int* ch = (int*)malloc(sizeof(int) * (n + 1));				//방문확인 배열
+	int* res = (int*)malloc(sizeof(int) * (n + 1));				//이심률 방문 배열
+
+	for (int i = 0; i <= n; i++) {	//동적할당한 배열들 초기화
+		g[i] = NULL;				
+		ch[i] = 0;
+		res[i] = 0;
+	}
+
+	for (int i = 0; i < m; i++) {
+		scanf("%d %d", &u, &v);				//생성할 간선 정점 2개 입력
+		edge* node = (edge*)malloc(sizeof(edge));
+		node->v = v;
+		node->next = g[u];
+		g[u] = node;					//u정점에 v연결
+
+		node = (edge*)malloc(sizeof(edge));
+		node->v = u;
+		node->next = g[v];
+		g[v] = node;					//v정점에 u연결
+	}									//양쪽에해야 무방향 그래프 완성이된다.
+
+	for (int i = 1; i <= n; i++) {
+		if (ch[i] == 0) {			//방문안한 정점 일때 실행
+			cnt++;					//연결요소 1증가 
+			dfs(g, i, ch, &cycle, -1);	
+		}
+	}
+
+	if (cnt != 1 || cycle)  //연결요소가 한개가 아니거나 cycle이 1일경우 연결요소 출력
+		printf("%d", cnt);
+	else {
+		cnt = 0;
+		while (size > 2) {		//사이즈가 2이하면 종료
+			cnt++;				//한번 반복마다 이심률 1증가
+			for (int i = 1; i <= n; i++)		//이심률 방문 체크 매번 검사시 0으로 초기화
+				ch[i] = 0;
+
+			for (int i = 1; i <= n; i++) {		
+				if (g[i] != NULL && ch[i] == 0 && g[i]->next == NULL) {//해당 정점이 NULL이 아니면서 방문하지 않고 자식이 없으면 실행
+					int v = g[i]->v;		// 간선 1개인 정점 v 저장
+					ch[v] = 1;				// ch[v]에 1저장
+					res[i] = 1;				//res[i]에 1저장 
+					free(g[i]);				//마지막 간선이므로 g[i]해제
+					g[i] = NULL;
+					size--;					//자식없는 노드이기때문에 size 1 감소 
+
+					edge* tmp = g[v];		//v정점에서 i의 정점 찾기위해 tmp에 저장
+					if (tmp->next == NULL) {	//다음 정점이 없으면 실행
+						free(g[v]);				//마지막 간선이므로 g[v]해제
+						g[v] = NULL;
+					}
+					else {
+						if (tmp->v == i) {		//첫번째에서 i정점을 찾으면 실행
+							edge* del = tmp;
+							g[v] = tmp->next;	//g[v]에 g[v]->next 저장
+							free(del);			//i정점 삭제
+						}
+						else {
+							while (tmp->next->v != i)  // 다음 정점에 i이면 종료
+								tmp = tmp->next;
+
+							edge* del = tmp->next;		//i 정점 del에 저장
+							tmp->next = tmp->next->next;//i정점을 삭제 했으므로 i의 다음 간선 저장 
+							free(del);
+						}
+					}
+				}
+			}
+		}
+		for (int i = 1; i <= n; i++)
+			if (res[i] != 1)			//이심률 출력
+				printf("%d ", i);
+		if (size == 1)					//사이즈가 1이면 이심률 그대로 출력
+			printf("\n%d", cnt);
+		else
+			printf("\n%d", cnt + 1);	//사이즈가 2이면 2개이기때문에 +1하여 이심률 출력
+
+	}
+
+	for (int i = 0; i <= n ; ++i) {  //동적할당 해제
+		edge* p = g[i];
+		while (p) {
+			edge* tmp = p;
+			p = p->next;
+			free(tmp);
+		}
+	}
+	free(ch);
+	free(res);
+}
