@@ -1,8 +1,6 @@
 #pragma warning(disable: 4996)
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
-
 typedef struct edge {
 	struct edge* next;
 	int v;
@@ -22,7 +20,6 @@ int main() {
 		v[i].edges = (edge*)malloc(sizeof(edge));
 		v[i].edges->next = NULL;
 	}
-
 	insertEege(v, 1, 2, 1);
 	insertEege(v, 1, 4, 1);
 	insertEege(v, 1, 6, 2);
@@ -46,6 +43,15 @@ int main() {
 		else break;
 		getchar();
 	}
+	for (int i = 0; i < 7; i++) {
+		edge* p = v[i].edges;
+		while (p) {
+			edge* tmp = p;
+			p = p->next;
+			free(tmp);
+		}
+	}
+	free(v);
 }
 void print(vertex* v, int e) {
 	if (e < 1 || e > 6)return printf("-1\n");
@@ -61,15 +67,14 @@ void insertEege(vertex* v, int v1, int v2, int val) {
 	if (v1 < 1 || v1 > 6 || v2 < 1 || v2 > 6)return printf("-1\n");
 	edge* p = v[v1].edges;
 
-	while (p->next != NULL && p->next->v < v2) {
+	while (p->next != NULL && p->next->v < v2) 
 		p = p->next;
-	}
+	
 	if (val) {
 		if (p->next == NULL || p->next->v != v2) {
 			edge* e = (edge*)malloc(sizeof(edge));
 			e->v = v2;
 			e->val = val;
-			e->next = NULL;
 
 			e->next = p->next;
 			p->next = e;
@@ -87,15 +92,14 @@ void insertEege(vertex* v, int v1, int v2, int val) {
 
 	p = v[v2].edges;
 
-	while (p->next != NULL && p->next->v < v1) {
+	while (p->next != NULL && p->next->v < v1) 
 		p = p->next;
-	}
+	
 	if (val) {
 		if (p->next == NULL || p->next->v != v1) {
 			edge* e2 = (edge*)malloc(sizeof(edge));
 			e2->v = v1;
 			e2->val = val;
-			e2->next = NULL;
 
 			e2->next = p->next;
 			p->next = e2;
@@ -110,7 +114,5 @@ void insertEege(vertex* v, int v1, int v2, int val) {
 		free(tmp);
 
 	}
-
-
 
 }
