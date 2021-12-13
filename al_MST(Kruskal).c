@@ -2,41 +2,36 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-typedef struct edge {
-	int v, w;
-	struct edge* next;
-}edge;
-
 typedef struct pq {
-	int u,v, w;
+	int u, v, w;
 }pq;
 
 int Find(int* unf, int v) {
 	if (unf[v] == v) return v;
-	else return unf[v] = Find(unf,unf[v]);
+	else return unf[v] = Find(unf, unf[v]);
 }
 int Union(int* unf, int u, int v) {
-	int a = Find(unf,u);
-	int b= Find(unf,v);
+	int a = Find(unf, u);
+	int b = Find(unf, v);
 	if (a != b) unf[a] = b;
 }
 
 int main(void) {
 
 	int  N, M, u, v, w;
-	int d[3000] = { 0, };
 	int size, idx, p, c, res = 0;
 	size = 0;
 	idx = 1;
+
 	pq temp;
 	scanf("%d %d", &N, &M);
-	pq* q = (pq*)malloc(sizeof(pq) *  M);
+	pq* q = (pq*)malloc(sizeof(pq) * (M+1));
 	int* unf = (int*)malloc(sizeof(int) * (N + 1));
+
 	for (int i = 0; i < M; ++i) {
 		scanf("%d %d %d", &temp.u, &temp.v, &temp.w);
 
 		idx = ++size;
-
 		while ((idx - 1) && (temp.w < q[idx / 2].w)) {
 			q[idx] = q[idx / 2];
 			q[idx] = q[idx / 2];
@@ -45,29 +40,11 @@ int main(void) {
 		q[idx].u = temp.u;
 		q[idx].w = temp.w;
 		q[idx].v = temp.v;
-
-
 	}
 	for (int i = 1; i <= N; i++) unf[i] = i;
-	
-
-
-
-
-			//접점 삽입
-			
-
-
-
-	for (int i = 1; i <= N; ++i)
-		d[i] = 0;
-
-
 
 	while (size) {
-
 		pq cur = q[1];
-
 
 		pq tmpq = q[size];
 		--size;
@@ -90,14 +67,10 @@ int main(void) {
 		if (fa != fb) {
 			printf("%d ", cur.w);
 			res += cur.w;
-			Union(unf,cur.u, cur.v);
+			Union(unf, cur.u, cur.v);
 		}
-
-	
 	}
 	printf("\n%d", res);
-
-
-
-	return 0;
+	free(unf); 
+	free(q);
 }
