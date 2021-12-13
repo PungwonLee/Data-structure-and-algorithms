@@ -38,7 +38,9 @@ int main() {
 		}
 		getchar();
 	}
-	return 0;
+	for (int i = 0; i < 7; i++)
+		free(arr[i]);
+	free(arr);
 }
 
 
@@ -51,8 +53,8 @@ void make(int** arr, int n, int m, int k) {
 }
 
 void print(int** arr, int n) {
-	if (n<1 ||n > 6)return printf("-1\n");
-	
+	if (n < 1 || n > 6)return printf("-1\n");
+
 	for (int i = 0; i < 7; i++) {
 		if (arr[n][i])
 			printf("%d %d ", i, arr[n][i]);
