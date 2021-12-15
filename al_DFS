@@ -1,0 +1,91 @@
+#pragma warning(disable: 4996)
+#include <stdio.h>
+#include <stdlib.h>
+typedef struct edge {
+	struct edge* next;
+	int v;
+}edge;
+
+typedef struct vertex {
+	struct edge* edges;
+
+}vertex;
+void print(vertex* v, int e);
+void dfs(vertex* v, int u, int* ch);
+void insertEege(vertex* v, int v1, int v2);
+int main() {
+	int n, m, s;
+	scanf("%d %d %d", &n, &m, &s);
+
+	vertex* v = (vertex*)malloc(sizeof(vertex) * (n + 1));
+	int* ch = (int*)malloc(sizeof(int) * (n + 1));
+
+	for (int i = 1; i <= n; i++) {
+		v[i].edges = (edge*)malloc(sizeof(edge));
+		v[i].edges->next = NULL;
+		ch[i] = 0;
+	}
+
+	int v1, v2;
+	for (int i = 0; i < m; i++) {
+		scanf("%d %d", &v1, &v2);
+		insertEege(v, v1, v2);
+	}
+	dfs(v, s, ch);
+	for (int i = 1; i <= n; i++) {
+		edge* p = v[i].edges;
+		while (p) {
+			edge* tmp = p;
+			p = p->next;
+			free(tmp);
+		}
+	}
+	free(ch); free(v);
+}
+
+void dfs(vertex* v, int u, int* ch) {
+	printf("%d\n", u);
+	ch[u] = 1;
+	edge* p = v[u].edges->next;
+	while (p != NULL) {
+		if (ch[p->v] == 0) {
+			dfs(v, p->v, ch);
+		}
+		p = p->next;
+	}
+}
+void print(vertex* v, int e) {
+	if (e < 1 || e > 6)return printf("-1\n");
+
+	edge* p = v[e].edges->next;
+	while (p != NULL) {
+		printf("%d ", p->v);
+		p = p->next;
+	}
+	printf("\n");
+}
+void insertEege(vertex* v, int v1, int v2) {
+	edge* p = v[v1].edges;
+	while (p->next != NULL && p->next->v < v2) 
+		p = p->next;
+	
+	if (p->next == NULL || p->next->v != v2) {
+		edge* e = (edge*)malloc(sizeof(edge));
+		e->v = v2;
+		e->next = p->next;
+		p->next = e;
+	}
+
+	if (v1 == v2)return;
+
+	p = v[v2].edges;
+	while (p->next != NULL && p->next->v < v1) 
+		p = p->next;
+	
+	if (p->next == NULL || p->next->v != v1) {
+		edge* e2 = (edge*)malloc(sizeof(edge));
+		e2->v = v1;
+		e2->next = p->next;
+		p->next = e2;
+	}
+}
